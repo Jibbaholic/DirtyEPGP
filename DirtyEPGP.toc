@@ -1,0 +1,11 @@
+## Interface: 11302
+## Title: Dirty EP GP Priority Calculator
+## Author: Chris McDonnell
+## Version: 0.1
+## Notes: /epgp [spec|class] [caster,melee,ranged|mage,warrior,rogue]
+## URL:
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+DirtyEPGP.lua
+DirtyEPGP.xml
