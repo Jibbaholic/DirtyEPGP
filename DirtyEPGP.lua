@@ -45,10 +45,11 @@ function CalculatePriority_SlashCmdHandler(msg)
 	if (arg1 == "" or arg2 == "") then
 		filter = "all"
 	else 
-		filter = "FILTER: " .. arg1 .. " - " .. arg2
+		filter = arg1 .. " - " .. arg2
 	end
 
 	spec = "";
+	color = "";
 
 	nGuildMembers = GetNumGuildMembers(true);
 	array = {}
@@ -72,76 +73,115 @@ function CalculatePriority_SlashCmdHandler(msg)
 		ep, gp = strsplit(",", g_officernote);
 		priority = round( ((tonumber(ep) or 0) / (tonumber(gp) or 0)),2 );
 
-		-- check if in group
-		-- check fiter args
-		if (ingroup ~= nil) then
-
-			-- do some shifty shit to check role
-			if (g_class == "Warrior") then
-				spec = "Melee";
-			elseif (g_class == "Warlock") then
-				spec = "Caster";
-			elseif (g_class == "Mage") then
-				spec = "Caster";
-			elseif (g_class == "Druid") then
-				spec = "Misc";
-			elseif (g_class == "Priest") then
-				spec = "Caster";
-			elseif (g_class == "Rogue") then
-				spec = "Melee";
-			elseif (g_class == "Shaman") then
-				spec = "Caster";
-			elseif (g_class == "Hunter") then
-				spec = "Ranged";
-			else 
-				spec = "Unknown";
-			end 
-
-			-- if filter by spec
-			if (string.lower(arg1) == "spec" and string.lower(arg2) == string.lower(spec)) then
-				raid_members = raid_members + 1;
-				array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec }	
-
-			-- if filter by class
-			elseif (string.lower(arg1) == "class" and string.lower(arg2) == string.lower(g_class)) then
-				raid_members = raid_members + 1;
-				array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec }	
-
-			-- else entire raid
-			elseif(arg1 == "") then
-				raid_members = raid_members + 1;
-				array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec }	
-			end
-
-			if (strlen(tname) > max_namelen) then
-				max_namelen = strlen(tname);
-			end 
-
+		-- do some shifty shit to check role
+		if (g_class == "Warrior") then
+			spec = "Melee";
+			color = "|cffc79c6e";
+		elseif (g_class == "Warlock") then
+			spec = "Caster";
+			color = "|cff9482c9";
+		elseif (g_class == "Mage") then
+			spec = "Caster";
+			color = "|cff69ccf0";
+		elseif (g_class == "Druid") then
+			spec = "Misc";
+			color = "|cffff7d0a";
+		elseif (g_class == "Priest") then
+			spec = "Caster";
+			color = "|cffffffff";
+		elseif (g_class == "Rogue") then
+			spec = "Melee";
+			color = "|cfffff569";
+		elseif (g_class == "Shaman") then
+			spec = "Caster";
+			color = "|cff0070de";
+		elseif (g_class == "Hunter") then
+			spec = "Ranged";
+			color = "|cffabd473";
+		else 
+			spec = "Unknown";
+			color = "";
 		end 
+
+		if (g_rank == "Officer" or g_rank == "Raid Leader" or g_rank == "PvP Leader" or g_rank == "Guild Master" ) then
+			g_rank = "Core"
+		end
+
+		-- check if in group
+		
+		-- raid filter
+		--if (string.lower(arg1) ~= "player" and ingroup ~= nil) then
+		-- if filter by spec
+		if (string.lower(arg1) == "spec" and ingroup ~= nil and string.lower(arg2) == string.lower(spec)) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+
+		-- if filter by class
+		elseif (string.lower(arg1) == "class" and ingroup ~= nil and string.lower(arg2) == string.lower(g_class)) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+
+		-- else entire raid
+		elseif(arg1 == "" and ingroup ~= nil ) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+				--end
+
+		-- 1 player
+		elseif (string.lower(arg1) == "player" and string.lower(arg2) == string.lower(tname)) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+
+		-- show core class
+		elseif (string.lower(arg1) == "core" and g_rank == "Core" and string.lower(arg2) == string.lower(g_class)) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+
+		-- show core spec
+		elseif (string.lower(arg1) == "core" and g_rank == "Core" and string.lower(arg2) == string.lower(spec)) then
+			raid_members = raid_members + 1;
+			array[raid_members] = { ["name"] = tname, ["rank"] = g_rank, ["class"] = g_class, ["ep"] = ep, ["gp"] = gp, ["prio"] = priority, ["spec"] = spec, ["color"] = color }	
+
+		end
+		
+		if( raid_members ~= 0 ) then
+			local _, name_len = string.gsub(array[raid_members].name, "[^\128-\193]", "")
+			if (name_len > max_namelen) then
+				max_namelen = name_len;
+			end 
+		end
 	end
 
 	table.sort(array, tableSortPrio);
-
-	print("<Dirty> EPGP: " .. filter);
+	print("");
+	print("|cff00ff00<Dirty> EPGP: Priority Rank for: " .. filter);
 	for i, members in ipairs(array) do
 
-		if (strlen( array[i].name ) == max_namelen) then 
-			_name = strsub( array[i].name .. junk, 1, ( max_namelen ) + 4 );
-		else
-			_name = strsub( array[i].name .. junk, 1, ( max_namelen ) + 5 );
-		end 
+		-- clean up
+		local _, name_len = string.gsub(array[i].name, "[^\128-\193]", "")
 
+		-- format the strings
+		-- if name has special char
+		if (name_len ~= strlen(array[i].name)) then 
+			_name = strsub( array[i].name .. junk, 1, ( max_namelen ) + 5 );
+		else 
+			_name = strsub( array[i].name .. junk, 1, ( max_namelen ) + 4 );
+		end
+		_ep = string.format("%03d", array[i].ep);
+		_gp = string.format("%02d", array[i].gp);
+		_prio = string.format("%.2f", array[i].prio);
+		
+		color = array[i].color;
 		-- highlight you
 		if (array[i].name == UnitName("player")) then
 			color = "|cffffff00"
-		else 
-			color = ""
 		end
 
 		-- print cause lazy
-		print(color .. tostring(i) .. ". " .. _name .. " " .. array[i].ep .. "/" .. array[i].gp .. " (" .. array[i].prio .. ")"
-		);
+		print(color .. string.format("%02d", tostring(i)) .. ". " .. _name .. " " .. _ep .. "/" .. _gp .. " (" .. _prio .. ")" );
 	end
+	print("");
+
 
 end
 
