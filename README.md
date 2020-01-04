@@ -2,19 +2,34 @@
 
 ## Description
 - Lists EP/GP and Priority for raid members in your guild based on officer note.
-- output formatting is a bit wack... 
 
-## Commands (these both do the same thing)
-- /ep
-- /epgp
+## Commands
+- /ep {raid|core|guild} {spec|class}
+- /ep {player} {player_name}
 
-## Filter to things you care about
-the following works in a guild raid:
-- /ep class {warrior|warlock|mage|druid|priest|rogue|shaman|hunter}
-- /ep spec {caster|melee|ranged}
+List of {spec}:
+- caster
+- melee
+- ranged
 
-the following work outside of a raid <Dirty>
-- /ep core {warrior|warlock|mage|druid|priest|rogue|shaman|hunter}
-- /ep core {caster|melee|ranged}
-- /ep player {player_name}
-  
+List of {class}:
+- warrior
+- warlock
+- mage
+- druid
+- priest
+- rogue
+- shaman
+- hunter
+
+### {Raid} Command
+Shows guild members if they are in raid
+
+### {Core} Command
+Shows guild members if they are Core rank or higher (excludes Officer Alt)
+
+### {Guild} Command
+Shows all guild members
+
+### {Player} Command
+Show a specific player
